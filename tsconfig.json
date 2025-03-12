@@ -12,7 +12,9 @@
     "noImplicitReturns": false,
     "noImplicitThis": false,
     "noImplicitAny": false,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true
   },
   "exclude": [
     "node_modules",
