@@ -10,15 +10,15 @@ export function App() {
     const url = "http://localhost:8092/graphql";
     const headers = {
       "Content-Type": "application/json",
-      Authorization: "Bearer X",
+      Authorization: `Bearer ${process.env.REACT_APP_TOKEN}`,
     };
 
     const body = JSON.stringify({
       query: `
             mutation FileCreate {
-                fileCreate(input: { fileName: "PULT", mimeType: "${file.type}", size: ${file.size} }) {
+                fileCreateUpload(input: { mimeType: "${file.type}", size: ${file.size} }) {
                     id
-                    url
+                    uploadUrl
                     fieldsJson
                 }
             }
@@ -33,10 +33,10 @@ export function App() {
       });
 
       const result = await response.json();
-      const data = result.data.fileCreate;
+      const data = result.data.fileCreateUpload;
       return {
         id: data.id,
-        url: data.url,
+        uploadUrl: data.uploadUrl,
         fields: JSON.parse(data.fieldsJson),
       };
     } catch (error) {
@@ -65,7 +65,7 @@ export function App() {
 
     formData.append("file", file);
 
-    const res = await fetch(signedPost.url, {
+    const res = await fetch(signedPost.uploadUrl, {
       method: "POST",
       body: formData,
     });
