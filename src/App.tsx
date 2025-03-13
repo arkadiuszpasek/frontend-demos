@@ -4,7 +4,22 @@ import "./App.css";
 const config = {
   allowedMimeTypes: ["image/jpeg", "image/png"],
   maxFileSize: 1024 * 1024 * 5, // 5MB
+  minWidth: 314,
+  minHeight: 314,
 };
+function getImageDimensions(file): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height });
+    };
+    img.onerror = () => {
+      reject(new Error("Failed to load image."));
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
 export function App() {
   const getSignedPost = async (file: File) => {
     const url = "http://localhost:8092/graphql";
@@ -50,11 +65,17 @@ export function App() {
 
     const file = (e.target as any).file.files[0];
 
+    const dim = await getImageDimensions(file);
+
+    if (dim.width < config.minWidth || dim.height < config.minHeight) {
+      return console.error("Image is too small");
+    }
+
     if (
       file.size > config.maxFileSize ||
       !config.allowedMimeTypes.includes(file.type)
     ) {
-      console.error("File is too large or has an invalid file type");
+      return console.error("File is too large or has an invalid file type");
     }
 
     const formData = new FormData();
